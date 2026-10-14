@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Clankers helped me! — Game Jam AI Disclosure Banner Generator</title>
 <meta name="description" content="Generate a playful thumbnail that discloses how AI clankers helped you build your game-jam entry.">
@@ -9,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/styles.css?v=6">
 </head>
 <body>
 <div class="bg-decor" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
@@ -43,9 +46,19 @@
           <p class="field-hint">A sentence or two about how AI helped.</p>
         </div>
         <div class="field">
+          <label for="fHeadline">Headline <span class="opt">optional</span></label>
+          <input id="fHeadline" type="text" placeholder="Clankers helped me!">
+          <p class="field-hint">The big line on the banner. Leave blank for “Clankers helped me!”.</p>
+        </div>
+        <div class="field">
           <label for="fTitle">Game title <span class="opt">optional</span></label>
           <input id="fTitle" type="text" placeholder="e.g. Clankers of the Deep">
           <p class="field-hint">Shown as a big ribbon on the banner.</p>
+        </div>
+        <div class="field">
+          <label for="fNickname">Creator nickname <span class="opt">optional</span></label>
+          <input id="fNickname" type="text" placeholder="e.g. AweSkyBear">
+          <p class="field-hint">Signed under the headline as “by …”.</p>
         </div>
       </div>
     </section>
@@ -80,14 +93,19 @@
     <section class="card">
       <header class="card-head">
         <span class="ico">🧰</span>
-        <div><h2>AI tools</h2><p>List the clankers you put to work.</p></div>
+        <div><h2>AI tools</h2><p>Add each tool, how it helped, and what it cost.</p></div>
       </header>
       <div class="card-body">
-        <div class="chips" id="toolList"></div>
+        <div class="tool-list" id="toolList"></div>
         <div class="tool-row">
-          <input id="fTool" type="text" placeholder="e.g. ChatGPT, Copilot, Stable Diffusion…">
+          <input id="fTool" type="text" placeholder="Tool name, e.g. ChatGPT">
           <button type="button" class="btn add" id="btnAddTool" title="Add tool">＋</button>
         </div>
+        <label class="toggle">
+          <input id="fShowPrice" type="checkbox" checked>
+          <span class="track"><span class="knob"></span></span>
+          <span class="toggle-text">Show price for tool in banner <small>“Free (0$)” / tokens / per month</small></span>
+        </label>
       </div>
     </section>
 
@@ -101,6 +119,32 @@
           <select id="fLevel"></select>
           <p class="level-desc" id="levelDesc"></p>
         </div>
+
+        <details class="level-tip">
+          <summary>ⓘ What do the levels mean? · the Shapiro Scale</summary>
+          <div class="level-tip-body">
+            <h3>The 5–6 Levels of AI-Assisted Software Engineering <span>(Shapiro Scale)</span></h3>
+            <dl>
+              <dt>Level 0 — Manual Coding / Spicy Autocomplete <em>(No AI approval bypass)</em></dt>
+              <dd>You write traditional code manually, or use basic inline syntax suggestions (like early tab-complete) that act as a glorified spell-checker.</dd>
+
+              <dt>Level 1 — AI Intern / Atomic Tasks</dt>
+              <dd>The AI handles discrete, low-context, repetitive tasks like writing single unit tests, boilerplate code, or simple functions while you direct every step.</dd>
+
+              <dt>Level 2 — AI-Native Pairing / Junior Colleague Workflow</dt>
+              <dd>Conversational or chat-assisted coding where you prompt, the AI suggests multi-line implementations or file diffs, and you manually review and test almost everything. This is where the vast majority of developers and teams currently operate.</dd>
+
+              <dt>Level 3 — Developer / Parallel Tasks with Human Review</dt>
+              <dd>The AI acts as an active partner running parallel tasks, refactoring across multiple files, and managing small workflows, though a human closely inspects and gates the output.</dd>
+
+              <dt>Level 4 — Engineering Team / Spec-Driven &amp; Unattended Execution</dt>
+              <dd>You write product specifications or high-level goals instead of code. Multiple agentic loops execute builds, run tests, and self-correct, shifting the human role toward product management, architecture, and oversight.</dd>
+
+              <dt>Level 5 — The Dark Software Factory <em>("Black Box")</em></dt>
+              <dd>Fully autonomous software development. A high-level product spec or business goal goes in, and verified production code comes out with zero human code-review or intervention in the inner loop. Humans only design and maintain the factory harnesses, safety guardrails, and simulation environments.</dd>
+            </dl>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -116,7 +160,10 @@
         </div>
         <div class="field">
           <label for="fSize">Image size</label>
-          <select id="fSize"></select>
+          <select id="fSize">
+            <!-- Default: Super Compact 512x512. buildSizes() rebuilds this list. -->
+            <option value="512x512" selected>Super compact · 512 × 512</option>
+          </select>
         </div>
         <label class="toggle">
           <input id="fBg" type="checkbox" checked>
@@ -128,19 +175,23 @@
   </form>
 
   <aside class="col preview">
+    <h2 class="shared-by" id="sharedBy" hidden></h2>
     <div class="preview-card">
       <div class="preview-head">
         <span class="dot"></span><span class="dot"></span><span class="dot"></span>
         <span class="preview-title">Live preview</span>
+        <span class="size-badge" id="sizeBadge">512 × 512</span>
         <span class="seed" id="seedBadge">seed —</span>
       </div>
-      <div class="canvas-wrap"><canvas id="canvas" width="1080" height="1080"></canvas></div>
+      <div class="canvas-wrap"><canvas id="canvas" width="512" height="512"></canvas></div>
     </div>
 
     <div class="actions">
       <button type="button" class="btn primary" id="btnGenerate">✨ Generate</button>
       <button type="button" class="btn" id="btnCopyShare">🔗 Copy Share URL</button>
       <button type="button" class="btn" id="btnDownload">⬇️ Download PNG</button>
+      <button type="button" class="btn shared-only" id="btnEditShared">🍴 Fork Banner</button>
+      <a class="btn shared-only" id="repoBtn" href="https://github.com/AweSkyBear/LD-Jam-Clankers-Helped-Me-Banner-Generator" target="_blank" rel="noopener">Fork me on GitHub</a>
     </div>
 
     <div class="share-row">
@@ -148,17 +199,17 @@
       <button type="button" class="btn small" id="btnCopyField">Copy</button>
     </div>
     <p class="hint" id="hint">Everything updates live. Copy the Share URL to reopen this exact banner.</p>
-    <p class="credit">Made for honest game jams · be kind, disclose your clankers 🤖💗</p>
+    <p class="credit">Made for honest game jams · be kind, disclose your clankers 🤖💗 · by AweSkyBear</p>
   </aside>
 </main>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="src/robot.js"></script>
-<script src="src/state.js"></script>
-<script src="src/url.js"></script>
-<script src="src/background.js"></script>
-<script src="src/render.js"></script>
-<script src="src/app.js"></script>
+<script src="src/robot.js?v=6"></script>
+<script src="src/state.js?v=6"></script>
+<script src="src/url.js?v=6"></script>
+<script src="src/background.js?v=6"></script>
+<script src="src/render.js?v=6"></script>
+<script src="src/app.js?v=6"></script>
 </body>
 </html>

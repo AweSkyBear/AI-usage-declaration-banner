@@ -46,6 +46,16 @@ window.CLANK = window.CLANK || {};
     ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
   }
 
+  function toolPriceText(tool) {
+    var mode = tool && tool.priceMode ? tool.priceMode : 'none';
+    var value = (tool && tool.price ? String(tool.price) : '').trim();
+    if (mode === 'none') return 'Free (0$)';
+    if (!value) return '';
+    if (mode === 'tokens') return /token/i.test(value) ? value : value + ' tokens';
+    if (mode === 'month') return /(\/\s*mo|per month|monthly)/i.test(value) ? value : value + '/mo';
+    return '';
+  }
+
   /* ---------- chips ---------- */
   function layoutChips(ctx, entries, o) {
     ctx.font = o.font;
@@ -119,19 +129,29 @@ window.CLANK = window.CLANK || {};
     var accent2 = pal.accent2;
     var chipsColors = pal.accents;
 
-    /* 1. robot thumbnail */
+    /* 1. robot thumbnail (gently animated when `animate` is on) */
     var RS = state.title ? 168 : 198;
+    var animT = (images && images.time) || 0;
+    var animOn = !!(images && images.animate);
+    var bob = animOn ? Math.sin(animT * 1.7) * RS * 0.035 : 0;
+    var tilt = animOn ? Math.sin(animT * 1.15) * 0.05 : 0;
+    var pulse = animOn ? 1 + Math.sin(animT * 1.7) * 0.015 : 1;
     blocks.push({
       h: RS,
       draw: function (c, y) {
-        var cx = 0, cy = y + RS / 2, r = RS / 2;
-        var g = c.createRadialGradient(cx, cy, r * 0.3, cx, cy, r * 1.3);
+        var r = RS / 2;
+        c.save();
+        c.translate(0, y + RS / 2 + bob);
+        c.rotate(tilt);
+        c.scale(pulse, pulse);
+
+        var g = c.createRadialGradient(0, 0, r * 0.3, 0, 0, r * 1.3);
         g.addColorStop(0, C.hexA(accent, 0.3));
         g.addColorStop(1, C.hexA(accent, 0));
         c.fillStyle = g;
-        c.beginPath(); c.arc(cx, cy, r * 1.3, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(0, 0, r * 1.3, 0, Math.PI * 2); c.fill();
 
-        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2);
+        c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2);
         c.fillStyle = '#ffffff'; c.fill();
         c.lineWidth = Math.max(4, r * 0.055);
         c.strokeStyle = C.hexA(accent, 0.55);
@@ -140,10 +160,11 @@ window.CLANK = window.CLANK || {};
         var img = images && images.thumb;
         if (img) {
           c.save();
-          c.beginPath(); c.arc(cx, cy, r - 8, 0, Math.PI * 2); c.clip();
-          drawCover(c, img, cx - r + 8, cy - r + 8, (r - 8) * 2, (r - 8) * 2);
+          c.beginPath(); c.arc(0, 0, r - 8, 0, Math.PI * 2); c.clip();
+          drawCover(c, img, -(r - 8), -(r - 8), (r - 8) * 2, (r - 8) * 2);
           c.restore();
         }
+        c.restore();
       }
     });
 
@@ -175,15 +196,45 @@ window.CLANK = window.CLANK || {};
       })();
     }
 
+    /* 2b. creator nickname byline (right after the game title) */
+    if (state.nickname && state.nickname.trim()) {
+      (function () {
+        var font = '800 24px ' + F.body;
+        ctx.font = font;
+        var text = '👤  by ' + state.nickname.trim();
+        var w = Math.min(maxW, Math.ceil(ctx.measureText(text).width) + 56);
+        var h = 48;
+        blocks.push({
+          h: h,
+          draw: function (c, y) {
+            c.save();
+            rr(c, -w / 2, y, w, h, h / 2);
+            c.fillStyle = 'rgba(255,255,255,0.9)';
+            c.fill();
+            c.lineWidth = 2.5;
+            c.strokeStyle = C.hexA(accent, 0.45);
+            c.stroke();
+            c.restore();
+            c.font = font;
+            c.textAlign = 'center'; c.textBaseline = 'middle';
+            c.fillStyle = INK_SOFT;
+            c.fillText(text, 0, y + h / 2 + 1);
+          }
+        });
+      })();
+    }
+
     /* 3. AI disclosure tag + big heading */
     (function () {
       var tagFont = '800 19px ' + F.body;
       ctx.font = tagFont;
       var tagText = 'AI DISCLOSURE';
-      var tagW = Math.ceil(ctx.measureText(tagText).width) + 48;
+      try { ctx.letterSpacing = '3px'; } catch (e) {}
+      var tagW = Math.ceil(ctx.measureText(tagText).width) + 56;
+      try { ctx.letterSpacing = '0px'; } catch (e) {}
       var tagH = 36;
       var makeFont = function (s) { return '700 ' + s + 'px ' + F.head; };
-      var headText = 'Clankers helped me!';
+      var headText = (state.headline && state.headline.trim()) || 'Clankers helped me!';
       var hs = fitFont(ctx, headText, maxW, 82, 34, makeFont);
       ctx.font = makeFont(hs);
       var headH = Math.round(hs * 1.2);
@@ -300,10 +351,21 @@ window.CLANK = window.CLANK || {};
       })();
     }
 
-    /* 7. AI tools */
-    if (state.tools && state.tools.length) {
+    /* 7. AI tools (each with optional note + price) */
+    var toolEntries = (state.tools || []).map(function (t) {
+      var name = t && t.name ? String(t.name).trim() : '';
+      if (!name) return null;
+      var text = '🔧  ' + name;
+      var note = (t.note || '').trim();
+      if (note) text += ' — ' + note;
+      var price = state.showToolPrice === false ? '' : toolPriceText(t);
+      if (price) text += '  ·  ' + price;
+      return { text: text };
+    }).filter(Boolean);
+
+    if (toolEntries.length) {
       (function () {
-        var L = layoutChips(ctx, [{ text: '🧰  AI tools: ' + state.tools.join('  ·  ') }], {
+        var L = layoutChips(ctx, toolEntries, {
           maxW: maxW, font: '700 23px ' + F.body, fontSize: 23,
           padX: 20, padY: 12, minH: 52, gapX: 12, gapY: 12
         });
@@ -317,11 +379,11 @@ window.CLANK = window.CLANK || {};
     /* 8. footer comment */
     if (state.footer && state.footer.trim()) {
       (function () {
-        var font = 'italic 700 23px ' + F.body;
+        var font = 'italic 700 30px ' + F.body;
         ctx.font = font;
-        var text = '💬  “' + state.footer.trim() + '”';
-        var lines = wrapText(ctx, text, maxW * 0.86);
-        var lh = Math.round(23 * 1.4);
+        var text = '💡  ' + state.footer.trim();
+        var lines = wrapText(ctx, text, maxW);
+        var lh = Math.round(30 * 1.4);
         blocks.push({
           h: lines.length * lh,
           draw: function (c, y) {
@@ -339,9 +401,9 @@ window.CLANK = window.CLANK || {};
   /* ---------- public render ---------- */
   C.render = function (canvas, state, opts) {
     opts = opts || {};
-    var parts = String(state.size || '1080x1080').split('x');
-    var W = parseInt(parts[0], 10) || 1080;
-    var H = parseInt(parts[1], 10) || 1080;
+    var parts = String(state.size || C.DEFAULT_SIZE || '512x512').split('x');
+    var W = parseInt(parts[0], 10) || 512;
+    var H = parseInt(parts[1], 10) || 512;
     canvas.width = W;
     canvas.height = H;
 
@@ -373,7 +435,7 @@ window.CLANK = window.CLANK || {};
     var maxW = pw - pad * 2;
     var availH = ph - pad * 2;
 
-    var content = build(ctx, state, maxW, { thumb: opts.thumb }, pal);
+    var content = build(ctx, state, maxW, { thumb: opts.thumb, time: opts.time, animate: opts.animate }, pal);
     if (!content.length) return;
 
     var totalH = content.reduce(function (s, b) { return s + b.h; }, 0) + GAP * (content.length - 1);

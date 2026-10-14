@@ -52,10 +52,13 @@ window.CLANK = window.CLANK || {};
   C.prune = function (state, dropImage) {
     var o = { v: 1 };
     if (state.title) o.t = state.title;
+    if (state.nickname) o.by = state.nickname;
+    if (state.headline && state.headline !== C.DEFAULT_HEADLINE) o.hd = state.headline;
     o.d = state.desc || '';
     if (!dropImage && state.img) o.img = state.img;
-    if (state.size && state.size !== C.SIZES[0].id) o.sz = state.size;
+    if (state.size && state.size !== C.DEFAULT_SIZE) o.sz = state.size;
     if (state.bg === false) o.bg = false;
+    if (state.showToolPrice === false) o.sp = false;
 
     var cats = (state.categories || []).filter(function (c) { return c.on; })
       .map(function (c) {
@@ -64,7 +67,17 @@ window.CLANK = window.CLANK || {};
       });
     if (cats.length) o.c = cats;
 
-    if (state.tools && state.tools.length) o.tl = state.tools;
+    var tools = (state.tools || []).map(function (t) {
+      var name = (t && t.name ? t.name : '').trim();
+      if (!name) return null;
+      var o = { n: name };
+      var note = (t.note || '').trim();
+      if (note) o.h = note;
+      var price = (t.price || '').trim();
+      if (t.priceMode && t.priceMode !== 'none' && price) o.p = t.priceMode + ':' + price;
+      return o;
+    }).filter(Boolean);
+    if (tools.length) o.tl = tools;
     if (state.level !== '' && state.level != null) o.lv = String(state.level);
     if (state.footer) o.f = state.footer;
     return o;
