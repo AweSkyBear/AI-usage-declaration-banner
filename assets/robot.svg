@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Friendly clanker robot">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d6f2ff"/>
+      <stop offset=".5" stop-color="#6fcdf6"/>
+      <stop offset="1" stop-color="#2f9fd6"/>
+    </linearGradient>
+    <linearGradient id="metal2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#49b6e6"/>
+      <stop offset="1" stop-color="#1d7fb4"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#173650"/>
+      <stop offset="1" stop-color="#07182a"/>
+    </linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".45" r=".62">
+      <stop offset="0" stop-color="#ffe66d" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#ffe66d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="256" cy="486" rx="150" ry="20" fill="#0b2136" opacity=".10"/>
+  <circle cx="256" cy="250" r="222" fill="url(#halo)"/>
+  <rect x="245" y="46" width="22" height="70" rx="11" fill="url(#metal2)"/>
+  <circle cx="256" cy="42" r="27" fill="#ffd166" stroke="#1d7fb4" stroke-width="7"/>
+  <circle cx="256" cy="42" r="11" fill="#ff8fab"/>
+  <rect x="52" y="192" width="48" height="110" rx="24" fill="url(#metal2)"/>
+  <rect x="412" y="192" width="48" height="110" rx="24" fill="url(#metal2)"/>
+  <rect x="90" y="106" width="332" height="278" rx="88" fill="url(#metal)" stroke="#1d7fb4" stroke-width="9"/>
+  <rect x="142" y="156" width="228" height="168" rx="58" fill="url(#screen)"/>
+  <circle cx="204" cy="228" r="27" fill="#8ef0ff"/>
+  <circle cx="308" cy="228" r="27" fill="#8ef0ff"/>
+  <circle cx="213" cy="219" r="9" fill="#ffffff"/>
+  <circle cx="317" cy="219" r="9" fill="#ffffff"/>
+  <path d="M206 280 q50 42 100 0" fill="none" stroke="#8ef0ff" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="172" cy="284" r="14" fill="#ff8fab" opacity=".7"/>
+  <circle cx="340" cy="284" r="14" fill="#ff8fab" opacity=".7"/>
+  <rect x="150" y="392" width="212" height="88" rx="44" fill="url(#metal)" stroke="#1d7fb4" stroke-width="9"/>
+  <circle cx="256" cy="436" r="25" fill="#ffd166" stroke="#1d7fb4" stroke-width="6"/>
+  <path d="M256 421 l8 15 16 2 -12 12 3 16 -15 -8 -15 8 3 -16 -12 -12 16 -2z" fill="#ff8fab"/>
+  <path d="M92 116 l7 18 18 7 -18 7 -7 18 -7 -18 -18 -7 18 -7z" fill="#ffe66d"/>
+  <path d="M424 88 l5 14 14 5 -14 5 -5 14 -5 -14 -14 -5 14 -5z" fill="#8ef0ff"/>
+  <path d="M440 332 l4 11 11 4 -11 4 -4 11 -4 -11 -11 -4 11 -4z" fill="#ff8fab"/>
+</svg>
