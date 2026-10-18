@@ -1,5 +1,5 @@
-/* Clankers helped me! - URL (base64) + hashing helpers. */
-window.CLANK = window.CLANK || {};
+/* AI Usage - URL (base64) + hashing helpers. */
+window.AIU = window.AIU || {};
 (function (C) {
   'use strict';
 
@@ -49,37 +49,10 @@ window.CLANK = window.CLANK || {};
   };
 
   /* ---------- compact payload ---------- */
-  C.prune = function (state, dropImage) {
-    var o = { v: 1 };
-    if (state.title) o.t = state.title;
-    if (state.nickname) o.by = state.nickname;
-    if (state.headline && state.headline !== C.DEFAULT_HEADLINE) o.hd = state.headline;
-    o.d = state.desc || '';
-    if (!dropImage && state.img) o.img = state.img;
+  C.prune = function (state) {
+    var o = { v: 2 };
+    o.x = state.text || '';
     if (state.size && state.size !== C.DEFAULT_SIZE) o.sz = state.size;
-    if (state.bg === false) o.bg = false;
-    if (state.showToolPrice === false) o.sp = false;
-
-    var cats = (state.categories || []).filter(function (c) { return c.on; })
-      .map(function (c) {
-        var note = (c.note || '').trim();
-        return note ? { i: c.id, n: note } : { i: c.id };
-      });
-    if (cats.length) o.c = cats;
-
-    var tools = (state.tools || []).map(function (t) {
-      var name = (t && t.name ? t.name : '').trim();
-      if (!name) return null;
-      var o = { n: name };
-      var note = (t.note || '').trim();
-      if (note) o.h = note;
-      var price = (t.price || '').trim();
-      if (t.priceMode && t.priceMode !== 'none' && price) o.p = t.priceMode + ':' + price;
-      return o;
-    }).filter(Boolean);
-    if (tools.length) o.tl = tools;
-    if (state.level !== '' && state.level != null) o.lv = String(state.level);
-    if (state.footer) o.f = state.footer;
     return o;
   };
 
@@ -90,26 +63,17 @@ window.CLANK = window.CLANK || {};
   };
 
   /* ---------- share URL ---------- */
-  var MAX_PAYLOAD = 16000;
-
   C.baseUrl = function () {
     return location.href.split('#')[0].split('?')[0];
   };
 
   C.makeShare = function (state) {
-    var payload = C.encode(C.prune(state, false));
-    var dropped = false;
-    if (payload.length > MAX_PAYLOAD && state.img) {
-      payload = C.encode(C.prune(state, true));
-      dropped = true;
-    }
+    var payload = C.encode(C.prune(state));
     var hash = C.hashHex(payload);
     return {
       url: C.baseUrl() + '?d=' + payload + '&h=' + hash,
       payload: payload,
-      hash: hash,
-      seed: parseInt(hash.slice(0, 8), 16) >>> 0,
-      dropped: dropped
+      hash: hash
     };
   };
 
@@ -125,4 +89,4 @@ window.CLANK = window.CLANK || {};
       return null;
     }
   };
-})(window.CLANK);
+})(window.AIU);

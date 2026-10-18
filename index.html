@@ -6,210 +6,71 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clankers helped me! — Game Jam AI Disclosure Banner Generator</title>
-<meta name="description" content="Generate a playful thumbnail that discloses how AI clankers helped you build your game-jam entry.">
-<link rel="icon" type="image/svg+xml" href="assets/robot.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/styles.css?v=6">
+<title>AI Usage — Disclosure Banner Generator</title>
+<meta name="description" content="Generate a small, professional AI-usage disclosure banner for your game-jam page.">
+<link rel="icon" type="image/svg+xml" href="assets/chip.svg">
+<link rel="stylesheet" href="assets/styles.css?v=7">
 </head>
 <body>
-<div class="bg-decor" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
 
 <header class="topbar">
   <div class="brand">
-    <img class="brand-bot" src="assets/robot.svg" alt="">
+    <img class="brand-chip" src="assets/chip.svg" alt="">
     <div class="brand-text">
-      <h1>Clankers helped me!</h1>
-      <p>Playful AI-disclosure banners for game jams like Ludum&nbsp;Dare.</p>
+      <h1>AI Usage</h1>
+      <p>Disclosure banner generator for game jams.</p>
     </div>
-  </div>
-  <div class="topbar-actions">
-    <button type="button" class="btn ghost" id="btnSurprise">🎲 Surprise me</button>
-    <button type="button" class="btn ghost" id="btnReset">↺ Reset</button>
   </div>
 </header>
 
-<main class="layout">
-  <form class="col form" id="form" autocomplete="off" novalidate>
+<main class="wrap">
+  <h2 class="shared-by" id="sharedBy" hidden></h2>
 
-    <section class="card">
-      <header class="card-head">
-        <span class="ico">✍️</span>
-        <div><h2>The essentials</h2><p>What did the clankers help you make?</p></div>
-      </header>
-      <div class="card-body">
-        <div class="field">
-          <label for="fDesc">Short description</label>
-          <textarea id="fDesc" rows="3" placeholder="Clankers helped me build my game!"></textarea>
-          <p class="field-hint">A sentence or two about how AI helped.</p>
-        </div>
-        <div class="field">
-          <label for="fHeadline">Headline <span class="opt">optional</span></label>
-          <input id="fHeadline" type="text" placeholder="Clankers helped me!">
-          <p class="field-hint">The big line on the banner. Leave blank for “Clankers helped me!”.</p>
-        </div>
-        <div class="field">
-          <label for="fTitle">Game title <span class="opt">optional</span></label>
-          <input id="fTitle" type="text" placeholder="e.g. Clankers of the Deep">
-          <p class="field-hint">Shown as a big ribbon on the banner.</p>
-        </div>
-        <div class="field">
-          <label for="fNickname">Creator nickname <span class="opt">optional</span></label>
-          <input id="fNickname" type="text" placeholder="e.g. AweSkyBear">
-          <p class="field-hint">Signed under the headline as “by …”.</p>
-        </div>
+  <section class="card">
+    <header class="card-head"><h2>Banner text</h2></header>
+    <div class="card-body">
+      <div class="field">
+        <label for="fText">Declaration</label>
+        <input id="fText" type="text" placeholder="e.g. Used AI to assist with code, art and audio.">
+        <p class="field-hint">One line of text. It wraps automatically and the banner grows taller if needed.</p>
       </div>
-    </section>
-
-    <section class="card">
-      <header class="card-head">
-        <span class="ico">🤖</span>
-        <div><h2>Robot thumbnail</h2><p>Keep the default clanker or drop in your own art.</p></div>
-      </header>
-      <div class="card-body">
-        <div class="thumb-row">
-          <img id="thumbPreview" class="thumb-preview" alt="Thumbnail preview" hidden>
-          <div class="thumb-actions">
-            <label class="btn file">📤 Upload image<input id="fThumb" type="file" accept="image/*"></label>
-            <button type="button" class="btn small danger" id="btnThumbClear" hidden>Remove</button>
-          </div>
-        </div>
-        <p class="field-hint">Optional override. PNG / JPG / SVG / GIF — square images look best.</p>
+      <div class="field">
+        <label for="fSize">Size</label>
+        <select id="fSize"></select>
       </div>
-    </section>
-
-    <section class="card">
-      <header class="card-head">
-        <span class="ico">🧩</span>
-        <div><h2>Where did AI help?</h2><p>Tick each category and add your own note.</p></div>
-      </header>
-      <div class="card-body">
-        <div class="grid-cats" id="categories"></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <header class="card-head">
-        <span class="ico">🧰</span>
-        <div><h2>AI tools</h2><p>Add each tool, how it helped, and what it cost.</p></div>
-      </header>
-      <div class="card-body">
-        <div class="tool-list" id="toolList"></div>
-        <div class="tool-row">
-          <input id="fTool" type="text" placeholder="Tool name, e.g. ChatGPT">
-          <button type="button" class="btn add" id="btnAddTool" title="Add tool">＋</button>
-        </div>
-        <label class="toggle">
-          <input id="fShowPrice" type="checkbox" checked>
-          <span class="track"><span class="knob"></span></span>
-          <span class="toggle-text">Show price for tool in banner <small>“Free (0$)” / tokens / per month</small></span>
-        </label>
-      </div>
-    </section>
-
-    <section class="card">
-      <header class="card-head">
-        <span class="ico">📈</span>
-        <div><h2>Level of AI used</h2><p>The dark-software-factory scale.</p></div>
-      </header>
-      <div class="card-body">
-        <div class="field">
-          <select id="fLevel"></select>
-          <p class="level-desc" id="levelDesc"></p>
-        </div>
-
-        <details class="level-tip">
-          <summary>ⓘ What do the levels mean? · the Shapiro Scale</summary>
-          <div class="level-tip-body">
-            <h3>The 5–6 Levels of AI-Assisted Software Engineering <span>(Shapiro Scale)</span></h3>
-            <dl>
-              <dt>Level 0 — Manual Coding / Spicy Autocomplete <em>(No AI approval bypass)</em></dt>
-              <dd>You write traditional code manually, or use basic inline syntax suggestions (like early tab-complete) that act as a glorified spell-checker.</dd>
-
-              <dt>Level 1 — AI Intern / Atomic Tasks</dt>
-              <dd>The AI handles discrete, low-context, repetitive tasks like writing single unit tests, boilerplate code, or simple functions while you direct every step.</dd>
-
-              <dt>Level 2 — AI-Native Pairing / Junior Colleague Workflow</dt>
-              <dd>Conversational or chat-assisted coding where you prompt, the AI suggests multi-line implementations or file diffs, and you manually review and test almost everything. This is where the vast majority of developers and teams currently operate.</dd>
-
-              <dt>Level 3 — Developer / Parallel Tasks with Human Review</dt>
-              <dd>The AI acts as an active partner running parallel tasks, refactoring across multiple files, and managing small workflows, though a human closely inspects and gates the output.</dd>
-
-              <dt>Level 4 — Engineering Team / Spec-Driven &amp; Unattended Execution</dt>
-              <dd>You write product specifications or high-level goals instead of code. Multiple agentic loops execute builds, run tests, and self-correct, shifting the human role toward product management, architecture, and oversight.</dd>
-
-              <dt>Level 5 — The Dark Software Factory <em>("Black Box")</em></dt>
-              <dd>Fully autonomous software development. A high-level product spec or business goal goes in, and verified production code comes out with zero human code-review or intervention in the inner loop. Humans only design and maintain the factory harnesses, safety guardrails, and simulation environments.</dd>
-            </dl>
-          </div>
-        </details>
-      </div>
-    </section>
-
-    <section class="card">
-      <header class="card-head">
-        <span class="ico">🎨</span>
-        <div><h2>Style &amp; footer</h2><p>Make it yours.</p></div>
-      </header>
-      <div class="card-body">
-        <div class="field">
-          <label for="fFooter">Footer comment <span class="opt">optional</span></label>
-          <input id="fFooter" type="text" placeholder="e.g. Built in 48 hours with way too much coffee ☕">
-        </div>
-        <div class="field">
-          <label for="fSize">Image size</label>
-          <select id="fSize">
-            <!-- Default: Super Compact 512x512. buildSizes() rebuilds this list. -->
-            <option value="512x512" selected>Super compact · 512 × 512</option>
-          </select>
-        </div>
-        <label class="toggle">
-          <input id="fBg" type="checkbox" checked>
-          <span class="track"><span class="knob"></span></span>
-          <span class="toggle-text">Playful background <small>generated from the share-link hash</small></span>
-        </label>
-      </div>
-    </section>
-  </form>
-
-  <aside class="col preview">
-    <h2 class="shared-by" id="sharedBy" hidden></h2>
-    <div class="preview-card">
-      <div class="preview-head">
-        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-        <span class="preview-title">Live preview</span>
-        <span class="size-badge" id="sizeBadge">512 × 512</span>
-        <span class="seed" id="seedBadge">seed —</span>
-      </div>
-      <div class="canvas-wrap"><canvas id="canvas" width="512" height="512"></canvas></div>
     </div>
+  </section>
 
-    <div class="actions">
-      <button type="button" class="btn primary" id="btnGenerate">✨ Generate</button>
-      <button type="button" class="btn" id="btnCopyShare">🔗 Copy Share URL</button>
-      <button type="button" class="btn" id="btnDownload">⬇️ Download PNG</button>
-      <button type="button" class="btn shared-only" id="btnEditShared">🍴 Fork Banner</button>
-      <a class="btn shared-only" id="repoBtn" href="https://github.com/AweSkyBear/LD-Jam-Clankers-Helped-Me-Banner-Generator" target="_blank" rel="noopener">Fork me on GitHub</a>
+  <section class="preview-card">
+    <div class="preview-head">
+      <span class="preview-title">Preview</span>
+      <span class="size-badge" id="sizeBadge">270 × 80</span>
     </div>
+    <div class="canvas-wrap"><canvas id="canvas" width="270" height="80"></canvas></div>
+  </section>
 
-    <div class="share-row">
-      <input id="shareUrl" type="text" readonly placeholder="Your share URL appears here…">
-      <button type="button" class="btn small" id="btnCopyField">Copy</button>
-    </div>
-    <p class="hint" id="hint">Everything updates live. Copy the Share URL to reopen this exact banner.</p>
-    <p class="credit">Made for honest game jams · be kind, disclose your clankers 🤖💗 · by AweSkyBear</p>
-  </aside>
+  <div class="actions">
+    <button type="button" class="btn primary" id="btnGenerate">Generate</button>
+    <button type="button" class="btn" id="btnCopyShare">Copy Share URL</button>
+    <button type="button" class="btn" id="btnDownload">Download PNG</button>
+    <button type="button" class="btn shared-only" id="btnEditShared">Fork Banner</button>
+    <a class="btn shared-only" id="repoBtn" href="https://github.com/AweSkyBear/LD-Jam-Clankers-Helped-Me-Banner-Generator" target="_blank" rel="noopener">Fork on GitHub</a>
+  </div>
+
+  <div class="share-row">
+    <input id="shareUrl" type="text" readonly placeholder="Share URL">
+    <button type="button" class="btn" id="btnCopyField">Copy</button>
+  </div>
+
+  <p class="hint" id="hint">The preview updates as you type. Copy the share URL to reopen this exact banner.</p>
+  <p class="credit">AI Usage · MIT License · by AweSkyBear</p>
 </main>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script src="src/robot.js?v=6"></script>
-<script src="src/state.js?v=6"></script>
-<script src="src/url.js?v=6"></script>
-<script src="src/background.js?v=6"></script>
-<script src="src/render.js?v=6"></script>
-<script src="src/app.js?v=6"></script>
+<script src="src/state.js?v=7"></script>
+<script src="src/url.js?v=7"></script>
+<script src="src/render.js?v=7"></script>
+<script src="src/app.js?v=7"></script>
 </body>
 </html>
